@@ -18,13 +18,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-    - name: Create File
-      run: |
-        echo "${{ inputs.file-content }}" > ${{ inputs.file-name }}
+      - name: Create File
+        run: |
+          echo "${{ inputs.file-content }}" > ${{ inputs.file-name }}
 
-    - name: Commit Changes
-      uses: EndBug/add-and-commit@v7
-      with:
-        author_name: Diego Martins
-        author_email: diegotec@live.com
-        message: "Arquivo ${{ inputs.file-name }} alterado !!!"
+      - name: Commit Changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: Diego Martins
+          author_email: diegotec@live.com
+          message: "Arquivo ${{ inputs.file-name }} alterado !!!"
