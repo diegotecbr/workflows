@@ -1,0 +1,16 @@
+name: Create File
+
+on: workflow_dispatch
+
+
+jobs:
+  create_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Create File
+        uses: actions/create-file@v1
+        with:
+          path: 'path/to/file.txt'
+          content: 'Hello, world!'
