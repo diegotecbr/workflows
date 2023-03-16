@@ -1,0 +1,30 @@
+name: Create File
+
+on: workflow_dispatch
+inputs:
+  file-name:
+    description: 'Nome do arquivo'
+    required: true
+    default: 'hello.txt'
+  file-content:
+    description: 'Conteudo do arquivo'
+    required: false
+    default: 'Conteudo nao alterado.'
+
+jobs:
+  create_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+    - name: Create File
+      run: |
+        echo "${{ inputs.file-content }}" > ${{ inputs.file-name }}
+
+    - name: Commit Changes
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: Diego Martins
+        author_email: diegotec@live.com
+        message: "Arquivo ${{ inputs.file-name }} alterado !!!"
