@@ -1,4 +1,4 @@
-name: Automatic Pull Request
+name: Automatic Pull Request with GitHub App
 
 on:
   push:
