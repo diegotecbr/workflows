@@ -21,7 +21,7 @@ jobs:
 
       - name: Get GitHub App token
         id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v1
+        uses: peter-murray/workflow-application-token-action@v2.1.0
         with:
           application_id: ${{ secrets.APP_ID_REPO }}
           application_private_key: ${{ secrets.PRIVATE_KEY_REPO }}
