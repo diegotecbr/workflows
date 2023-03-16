@@ -1,15 +1,16 @@
 name: Create File
 
-on: workflow_dispatch
-inputs:
-  file-name:
-    description: 'Nome do arquivo'
-    required: true
-    default: 'hello.txt'
-  file-content:
-    description: 'Conteudo do arquivo'
-    required: false
-    default: 'Conteudo nao alterado.'
+on: 
+  workflow_dispatch:
+    inputs:
+      file-name:
+        description: 'Nome do arquivo'
+        required: true
+        default: 'hello.txt'
+      file-content:
+        description: 'Conteudo do arquivo'
+        required: false
+        default: 'Conteudo nao alterado.'
 
 jobs:
   create_file:
