@@ -1,0 +1,31 @@
+name: Automatic Pull Request
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "Diego Martins"
+          git config --global user.email "diegotec@live.com"
+
+      - name: Create Pull Request to v1
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Automatically created Pull Request for new feature branch"
+          title: "Automatic Pull Request: New feature"
+          body: "This Pull Request is automatically created for the new feature branch."
+          base: main
+          branch: v1ss
+          labels: auto-pr
