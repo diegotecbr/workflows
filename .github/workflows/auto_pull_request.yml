@@ -27,5 +27,5 @@ jobs:
           title: "Automatic Pull Request: New feature"
           body: "This Pull Request is automatically created for the new feature branch."
           base: main
-          branch: v1ss
+          branch: v1
           labels: auto-pr
