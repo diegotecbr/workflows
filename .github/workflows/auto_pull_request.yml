@@ -33,6 +33,6 @@ jobs:
           commit-message: "Automatically created Pull Request for new feature branch"
           title: "Automatic Pull Request: New feature"
           body: "This Pull Request is automatically created for the new feature branch."
-          base: main
-          branch: v1
+          base: v1
+          branch: feature/workflows
           labels: auto-pr
