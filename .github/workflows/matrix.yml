@@ -36,16 +36,22 @@ jobs:
 
           MATRIX="{\"include\":[$(IFS=,; echo "${APPS[*]}")]}"
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+      - name: Debug
+        run: |
+          echo "${{ fromJson(steps.check.outputs.matrix) }}"
   debug:
     needs: detect-changes
     runs-on: ubuntu-latest
     steps:
-      - name: Checar código
+      - name: Debug
         run: |
           echo "${{ fromJson(needs.detect-changes.outputs.matrix) }}"
         
   deploy-apps:
-    needs: detect-changes
+    needs: 
+      - detect-changes
+      - debug
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
