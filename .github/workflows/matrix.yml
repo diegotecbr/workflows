@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # Permite disparo manual pelo GitHub Actions
 
 jobs:
   generate-matrix:
@@ -13,7 +14,7 @@ jobs:
     steps:
       - name: Gerar matriz JSON
         id: set-matrix
-        run: echo 'matrix={"include":[{"name":"Job 1","value":1},{"name":"Job 2","value":2}]}' >> $GITHUB_OUTPUT
+        run: echo 'matrix={"include":[{"name":"Sucesso","value":1},{"name":"Erro","value":2}]}' >> $GITHUB_OUTPUT
 
   use-matrix:
     needs: generate-matrix
@@ -22,11 +23,17 @@ jobs:
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Executando job da matriz
-        run: echo "Rodando ${{ matrix.name }} com valor ${{ matrix.value }}"
+        run: |
+          echo "Rodando ${{ matrix.name }} com valor ${{ matrix.value }}"
+          if [ "${{ matrix.value }}" -eq 2 ]; then
+            echo "Simulando erro..."
+            exit 1
+          fi
 
   final-step:
     needs: [generate-matrix, use-matrix]
     runs-on: ubuntu-latest
+    if: always()  # Permite que este job rode mesmo se "use-matrix" falhar
     strategy:
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
