@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Permite disparo manual pelo GitHub Actions
+  workflow_dispatch:  # Permite execução manual
 
 jobs:
   generate-matrix:
@@ -30,12 +30,26 @@ jobs:
             exit 1
           fi
 
-  final-step:
-    needs: [generate-matrix, use-matrix]
+  filter-success:
+    needs: use-matrix
     runs-on: ubuntu-latest
-    if: always()  # Permite que este job rode mesmo se "use-matrix" falhar
+    if: always()  # Garante que este job rode mesmo que "use-matrix" tenha falhas
+    outputs:
+      success_matrix: ${{ steps.filter.outputs.success_matrix }}
+    steps:
+      - name: Filtrar apenas os jobs que tiveram sucesso
+        id: filter
+        run: |
+          MATRIX='${{ needs.generate-matrix.outputs.matrix }}'
+          SUCCESS_MATRIX=$(echo "$MATRIX" | jq -c '{"include": [ .include[] | select(.value != 2) ]}')
+          echo "success_matrix=$SUCCESS_MATRIX" >> $GITHUB_OUTPUT
+
+  final-step:
+    needs: filter-success
+    runs-on: ubuntu-latest
+    if: ${{ needs.filter-success.outputs.success_matrix != '{"include":[]}' }}  # Só executa se houver itens na matriz filtrada
     strategy:
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.filter-success.outputs.success_matrix) }}
     steps:
       - name: Passo final usando a matriz
         run: echo "Finalizando ${{ matrix.name }} com valor ${{ matrix.value }}"
