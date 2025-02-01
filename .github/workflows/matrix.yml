@@ -39,7 +39,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo ${{ fromJson(steps.check.outputs.matrix) }}
+          echo ${{ steps.check.outputs.matrix }}
 
   deploy-apps:
     needs: 
