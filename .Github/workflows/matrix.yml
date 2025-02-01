@@ -1,0 +1,32 @@
+name: Matrix Workflow Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Gerar matriz JSON
+        id: set-matrix
+        run: echo 'matrix={"include":[{"name":"Job 1","value":1},{"name":"Job 2","value":2}]}' >> $GITHUB_OUTPUT
+
+  use-matrix:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: Executando job da matriz
+        run: echo "Rodando ${{ matrix.name }} com valor ${{ matrix.value }}"
+
+  final-step:
+    needs: use-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    steps:
+      - name: Passo final usando a matriz
+        run: echo "Finalizando ${{ matrix.name }} com valor ${{ matrix.value }}"
