@@ -13,7 +13,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ fromJson(steps.check.outputs.matrix) }}
+      matrix: ${{ steps.check.outputs.matrix }}
     steps:
       - name: Checar código
         uses: actions/checkout@v4
