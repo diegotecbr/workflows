@@ -21,6 +21,7 @@ jobs:
       - name: Identificar mudanças
         id: check
         run: |
+          git fetch --prune --unshallow
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Arquivos alterados:"
           echo "$CHANGED_FILES"
@@ -35,7 +36,7 @@ jobs:
 
           MATRIX="{\"include\":[$(IFS=,; echo "${APPS[*]}")]}"
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-
+    
   deploy-apps:
     needs: detect-changes
     runs-on: ubuntu-latest
