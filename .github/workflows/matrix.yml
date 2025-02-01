@@ -33,11 +33,11 @@ jobs:
           fi
 
           MATRIX="{\"include\":[$(IFS=,; echo "${APPS[*]}")]}"
-          echo "$MATRIX" > matrix.json
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
       - name: Debug
         run: |
-          cat matrix.json
+          echo "${{ needs.detect-changes.outputs.matrix }}"
 
   deploy-apps:
     needs: 
