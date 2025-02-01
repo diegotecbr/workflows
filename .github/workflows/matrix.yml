@@ -30,26 +30,12 @@ jobs:
             exit 1
           fi
 
-  filter-success:
+  final-step:
     needs: use-matrix
     runs-on: ubuntu-latest
-    if: always()  # Garante que este job rode mesmo que "use-matrix" tenha falhas
-    outputs:
-      success_matrix: ${{ steps.filter.outputs.success_matrix }}
-    steps:
-      - name: Filtrar apenas os jobs que tiveram sucesso
-        id: filter
-        run: |
-          MATRIX='${{ needs.generate-matrix.outputs.matrix }}'
-          SUCCESS_MATRIX=$(echo "$MATRIX" | jq -c '{"include": [ .include[] | select(.value != 2) ]}')
-          echo "success_matrix=$SUCCESS_MATRIX" >> $GITHUB_OUTPUT
-
-  final-step:
-    needs: filter-success
-    runs-on: ubuntu-latest
-    if: ${{ needs.filter-success.outputs.success_matrix != '{"include":[]}' }}  # Só executa se houver itens na matriz filtrada
+    if: success()  # Agora só executa se todos os jobs de "use-matrix" forem bem-sucedidos
     strategy:
-      matrix: ${{ fromJson(needs.filter-success.outputs.success_matrix) }}
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
     steps:
       - name: Passo final usando a matriz
         run: echo "Finalizando ${{ matrix.name }} com valor ${{ matrix.value }}"
