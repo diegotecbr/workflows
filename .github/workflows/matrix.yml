@@ -12,8 +12,6 @@ on:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checar código
         uses: actions/checkout@v4
@@ -35,11 +33,11 @@ jobs:
           fi
 
           MATRIX="{\"include\":[$(IFS=,; echo "${APPS[*]}")]}"
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "$MATRIX" > matrix.json
 
       - name: Debug
         run: |
-          echo "${{ steps.check.outputs.matrix }}"
+          cat matrix.json
 
   deploy-apps:
     needs: 
