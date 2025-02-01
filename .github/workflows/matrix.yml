@@ -37,7 +37,7 @@ jobs:
 
       - name: Debug
         run: |
-          ${{ fromJson(steps.detect-changes.outputs.matrix) }}
+          ${{ fromJson(steps.check.outputs.matrix) }}
 
   deploy-apps:
     needs: 
