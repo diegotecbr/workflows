@@ -1,41 +1,75 @@
-name: Matrix Workflow Example
+name: Dynamic App Deployment
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:  # Permite execução manual
 
 jobs:
-  generate-matrix:
+  detect-changes:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Gerar matriz JSON
-        id: set-matrix
-        run: echo 'matrix={"include":[{"name":"Sucesso","value":1},{"name":"Erro","value":2}]}' >> $GITHUB_OUTPUT
+      - name: Checar código
+        uses: actions/checkout@v4
 
-  use-matrix:
-    needs: generate-matrix
+      - name: Identificar mudanças
+        id: check
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "Arquivos alterados:"
+          echo "$CHANGED_FILES"
+
+          APPS=()
+          if echo "$CHANGED_FILES" | grep -q "^app1/"; then
+            APPS+=('{"name":"app1"}')
+          fi
+          if echo "$CHANGED_FILES" | grep -q "^app2/"; then
+            APPS+=('{"name":"app2"}')
+          fi
+
+          MATRIX="{\"include\":[$(IFS=,; echo "${APPS[*]}")]}"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+  deploy-apps:
+    needs: detect-changes
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
-      - name: Executando job da matriz
+      - name: Deploy ${{ matrix.name }}
         run: |
-          echo "Rodando ${{ matrix.name }} com valor ${{ matrix.value }}"
-          if [ "${{ matrix.value }}" -eq 2 ]; then
-            echo "Simulando erro..."
+          echo "Fazendo deploy da ${{ matrix.name }}..."
+          if [ "${{ matrix.name }}" == "app2" ]; then
+            echo "Simulando erro no deploy de app2"
             exit 1
           fi
 
-  final-step:
-    needs: use-matrix
+  filter-success:
+    needs: deploy-apps
     runs-on: ubuntu-latest
-    if: success()  # Agora só executa se todos os jobs de "use-matrix" forem bem-sucedidos
-    strategy:
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    if: always()
+    outputs:
+      success_matrix: ${{ steps.filter.outputs.success_matrix }}
     steps:
-      - name: Passo final usando a matriz
-        run: echo "Finalizando ${{ matrix.name }} com valor ${{ matrix.value }}"
+      - name: Filtrar apenas os deployments bem-sucedidos
+        id: filter
+        run: |
+          MATRIX='${{ needs.detect-changes.outputs.matrix }}'
+          SUCCESS_MATRIX=$(echo "$MATRIX" | jq -c '{"include": [ .include[] | select(.name != "app2") ]}')
+          echo "success_matrix=$SUCCESS_MATRIX" >> $GITHUB_OUTPUT
+
+  final-step:
+    needs: filter-success
+    runs-on: ubuntu-latest
+    if: ${{ needs.filter-success.outputs.success_matrix != '{"include":[]}' }}
+    strategy:
+      matrix: ${{ fromJson(needs.filter-success.outputs.success_matrix) }}
+    steps:
+      - name: Concluir processamento para ${{ matrix.name }}
+        run: echo "Finalizando fluxo para ${{ matrix.name }}"
