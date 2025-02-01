@@ -39,8 +39,8 @@ jobs:
 
       - name: Debug
         run: |
-          echo "${{ toJson(steps.check.outputs.matrix).include }}"
-  
+          echo "${{ steps.check.outputs.matrix }}"
+
   deploy-apps:
     needs: 
       - detect-changes
@@ -48,6 +48,10 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
     steps:
+      - name: Debug Matrix
+        run: |
+          echo "Matriz de execução: ${{ matrix }}"
+      
       - name: Deploy ${{ matrix.name }}
         run: |
           echo "Fazendo deploy da ${{ matrix.name }}..."
