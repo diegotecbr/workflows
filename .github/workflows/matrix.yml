@@ -55,27 +55,3 @@ jobs:
             echo "Simulando erro no deploy de app2"
             exit 1
           fi
-
-  filter-success:
-    needs: deploy-apps
-    runs-on: ubuntu-latest
-    if: always()
-    outputs:
-      success_matrix: ${{ steps.filter.outputs.success_matrix }}
-    steps:
-      - name: Filtrar apenas os deployments bem-sucedidos
-        id: filter
-        run: |
-          MATRIX='${{ needs.detect-changes.outputs.matrix }}'
-          SUCCESS_MATRIX=$(echo "$MATRIX" | jq -c '{"include": [ .include[] | select(.name != "app2") ]}')
-          echo "success_matrix=$SUCCESS_MATRIX" >> $GITHUB_OUTPUT
-
-  final-step:
-    needs: filter-success
-    runs-on: ubuntu-latest
-    if: ${{ needs.filter-success.outputs.success_matrix != '{"include":[]}' }}
-    strategy:
-      matrix: ${{ fromJson(needs.filter-success.outputs.success_matrix) }}
-    steps:
-      - name: Concluir processamento para ${{ matrix.name }}
-        run: echo "Finalizando fluxo para ${{ matrix.name }}"
