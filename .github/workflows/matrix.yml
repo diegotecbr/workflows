@@ -1,7 +1,9 @@
 name: Matrix Workflow Example
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   generate-matrix:
@@ -23,7 +25,7 @@ jobs:
         run: echo "Rodando ${{ matrix.name }} com valor ${{ matrix.value }}"
 
   final-step:
-    needs: use-matrix
+    needs: [generate-matrix, use-matrix]
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
