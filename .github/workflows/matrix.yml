@@ -39,7 +39,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo "${{ toJson(steps.check.outputs.matrix) }}"
+          echo "${{ toJson(steps.check.outputs.matrix).include }}"
   
   deploy-apps:
     needs: 
