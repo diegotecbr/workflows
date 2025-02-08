@@ -2,7 +2,8 @@
 flowchart LR
     A([Dev Commit / Pull Request<br>no Repositório GitHub]) -->|Dispara Workflow| B[Job: Build (Matrix)]
 
-    B --> BuildStart[ ]
+    B --> BuildStart
+
     subgraph Build
       BuildStart --> C1[Build Lambda 1<br>Publicar ZIP em Artifactory]
       BuildStart --> C2[Build Lambda 2<br>Publicar ZIP em Artifactory]
@@ -11,7 +12,8 @@ flowchart LR
     C1 --> D[Job: Infra (Matrix)]
     C2 --> D
 
-    D --> InfraStart[ ]
+    D --> InfraStart
+
     subgraph Infra
       InfraStart --> E1[Terraform para Lambda 1<br>(infra/lambda1)]
       InfraStart --> E2[Terraform para Lambda 2<br>(infra/lambda2)]
@@ -20,7 +22,8 @@ flowchart LR
     E1 --> F[Job: Deploy (Matrix)]
     E2 --> F
 
-    F --> DeployStart[ ]
+    F --> DeployStart
+
     subgraph Deploy
       DeployStart --> G1[Recuperar ZIP Lambda 1<br>do Artifactory<br>aws lambda update-function-code]
       DeployStart --> G2[Recuperar ZIP Lambda 2<br>do Artifactory<br>aws lambda update-function-code]
