@@ -1,6 +1,6 @@
 ```mermaid
 flowchart LR
-    A([Dev Commit / Pull Request no Repositório GitHub]) -->|Dispara Workflow| B(Job: Build (Matrix))
+    A([Dev Commit / Pull Request no Repositório GitHub]) -->|Dispara Workflow| B([Job: Build (Matrix)])
 
     B --> BuildStart
 
